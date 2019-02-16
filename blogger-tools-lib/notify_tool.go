@@ -37,13 +37,13 @@ func (tool *NotifyTool) Run(args *NotifyToolArgs) (err error) {
 	tool.Logger.Info("Running NotifyTool")
 
 	var errorFlag = false
-	for _, blogId := range args.Config.BlogIDs {
-		tool.Logger.Infof("Running NotifyTool for BlogID: %s", blogId)
-		blogger := blogger_tools_blogger.NewBlogger(tool.Logger, args.Config.APIKey, blogId)
+	for _, blogConfig := range args.Config.Blogs {
+		tool.Logger.Infof("Running NotifyTool for BlogID: %s", blogConfig.ID)
+		blogger := blogger_tools_blogger.NewBlogger(tool.Logger, blogConfig.APIKey, blogConfig.ID)
 		blog, err := blogger.Blog.Get()
 		if err != nil {
 			errorFlag = true
-			tool.Logger.Errorf("BlogID: %s; Message: %s", blogId, err)
+			tool.Logger.Errorf("BlogID: %s; Message: %s", blogConfig.ID, err)
 			continue
 		}
 

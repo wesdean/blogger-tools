@@ -7,8 +7,12 @@ import (
 
 type Config struct {
 	Environment string
-	APIKey      string
-	BlogIDs     []string
+	Blogs       []BlogConfig
+}
+
+type BlogConfig struct {
+	APIKey string
+	ID     string
 }
 
 func NewConfig(fileName string) (*Config, error) {

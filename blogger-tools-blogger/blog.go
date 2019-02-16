@@ -37,14 +37,6 @@ type Image struct {
 	URL string `json:"url,omitempty"`
 }
 
-type PostList struct {
-	TotalItems int    `json:"totalItems,omitempty"`
-	SelfLink   string `json:"selfLink,omitempty"`
-	Posts      []Post
-}
-
-type Post struct{}
-
 func NewBlogFromJSON(data []byte) (blog *Blog, err error) {
 	blog = &Blog{}
 	return blog, blog.parseJSON(data)

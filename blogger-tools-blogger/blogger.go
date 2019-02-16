@@ -5,6 +5,7 @@ import "github.com/google/logger"
 type Blogger struct {
 	Blog     *BlogService
 	PageList *PageListService
+	PostList *PostListService
 }
 
 func NewBlogger(logger *logger.Logger, apiKey string, blogId string) *Blogger {
@@ -12,5 +13,6 @@ func NewBlogger(logger *logger.Logger, apiKey string, blogId string) *Blogger {
 	return &Blogger{
 		Blog:     &BlogService{Client: client},
 		PageList: &PageListService{Client: client},
+		PostList: &PostListService{Client: client},
 	}
 }

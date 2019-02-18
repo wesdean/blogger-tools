@@ -8,7 +8,7 @@ import (
 func TestPostListService_Get(t *testing.T) {
 	config := getConfig()
 
-	blogger := blogger_tools_blogger.NewBlogger(nil, config.APIKey, config.BlogIDs[0])
+	blogger := blogger_tools_blogger.NewBlogger(getLogger(), config.Blogs[0].APIKey, config.Blogs[0].ID)
 	postList, err := blogger.PostList.Get()
 	if err != nil {
 		t.Error(err)

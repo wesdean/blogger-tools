@@ -1,5 +1,5 @@
 .idea
-conf.json
+app_data
 
 # Binaries for programs and plugins
 *.exe

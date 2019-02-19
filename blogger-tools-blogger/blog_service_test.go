@@ -6,9 +6,13 @@ import (
 )
 
 func TestBlogService_Get(t *testing.T) {
-	config := getConfig()
+	config, err := getConfig()
+	if err != nil {
+		t.Error(err)
+		return
+	}
 
-	blogger := blogger_tools_blogger.NewBlogger(nil, config.Blogs[0].APIKey, config.Blogs[0].ID)
+	blogger := blogger_tools_blogger.NewBlogger(nil, config.Blogs[0].AccessToken, config.Blogs[0].ID)
 	blog, err := blogger.Blog.Get()
 	if err != nil {
 		t.Error(err)

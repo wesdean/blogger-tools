@@ -5,21 +5,21 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/logger"
-	"github.com/kr/pretty"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 )
 
 var bloggerBaseURL = "https://www.googleapis.com/blogger/v3/blogs/"
 
 type Client struct {
-	logger     *logger.Logger
-	baseURL    string
-	apiKey     string
-	blogId     string
-	httpClient *http.Client
+	logger      *logger.Logger
+	baseURL     string
+	accessToken string
+	blogId      string
+	httpClient  *http.Client
 }
 
 type ErrorResponse struct {
@@ -38,21 +38,30 @@ type ErrorResponseErrorItem struct {
 	Message string `json:"message,omitempty"`
 }
 
-func NewClient(logger *logger.Logger, apiKey string, blogId string) *Client {
+func NewClient(logger *logger.Logger, accessToken string, blogId string) *Client {
 	return &Client{
-		logger:     logger,
-		baseURL:    bloggerBaseURL + blogId,
-		apiKey:     apiKey,
-		blogId:     blogId,
-		httpClient: &http.Client{},
+		logger:      logger,
+		baseURL:     bloggerBaseURL + blogId,
+		accessToken: accessToken,
+		blogId:      blogId,
+		httpClient:  &http.Client{},
 	}
 }
 
-func (client *Client) SendRequest(path string) ([]byte, error) {
+func (client *Client) SendRequest(path string, params map[string]string) ([]byte, error) {
 	options := url.Values{}
-	options.Set("access_token", client.apiKey)
+	if params != nil {
+		for key, value := range params {
+			options.Set(key, value)
+		}
+	}
+	if client.accessToken != "" {
+		options.Set("access_token", client.accessToken)
+	} else {
+		options.Set("access_token", os.Getenv("ACCESS_TOKEN"))
+	}
+
 	urlStr := client.baseURL + path + "?" + options.Encode()
-	pretty.Println(urlStr)
 	resp, err := client.httpClient.Get(urlStr)
 	if err != nil {
 		client.logger.Error(err)

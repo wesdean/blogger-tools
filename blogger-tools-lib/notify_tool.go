@@ -39,7 +39,7 @@ func (tool *NotifyTool) Run(args *NotifyToolArgs) (err error) {
 	var errorFlag = false
 	for _, blogConfig := range args.Config.Blogs {
 		tool.Logger.Infof("Running NotifyTool for BlogID: %s", blogConfig.ID)
-		blogger := blogger_tools_blogger.NewBlogger(tool.Logger, blogConfig.APIKey, blogConfig.ID)
+		blogger := blogger_tools_blogger.NewBlogger(tool.Logger, blogConfig.AccessToken, blogConfig.ID)
 		blog, err := blogger.Blog.Get()
 		if err != nil {
 			errorFlag = true

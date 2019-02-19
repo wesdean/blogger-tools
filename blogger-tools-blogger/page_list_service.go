@@ -5,7 +5,7 @@ type PageListService struct {
 }
 
 func (service *PageListService) Get() (pageList *PageList, err error) {
-	body, err := service.SendRequest("/pages")
+	body, err := service.SendRequest("/pages", nil)
 
 	pageList, err = NewPageListFromJSON(body)
 	if err != nil {

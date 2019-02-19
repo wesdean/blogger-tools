@@ -6,16 +6,23 @@ import (
 	"io/ioutil"
 )
 
-func getConfig() *blogger_tools_lib.Config {
+var skipExternalServices = true
+
+func getConfig() (*blogger_tools_lib.Config, error) {
+	accessToken, err := ioutil.ReadFile("../secrets/access_token.txt")
+	if err != nil {
+		return nil, err
+	}
+
 	return &blogger_tools_lib.Config{
 		Environment: "test",
 		Blogs: []blogger_tools_lib.BlogConfig{
 			{
-				APIKey: "ya29.GluzBhckAT2UMnmgrlYy8Usdbs22TNhNmwlZMFxUw7XZrOAnW0PA0S-G1QxA2jXSNrKQ__U6y4RTLkA8_r0mxnd11H8NsX1Xdu8Z4rj9gZkJu2lMsZ6rBxcQujNX",
-				ID:     "1038304627327029055",
+				AccessToken: string(accessToken),
+				ID:          "3051261493420306591",
 			},
 		},
-	}
+	}, nil
 }
 
 func getLogger() *logger.Logger {

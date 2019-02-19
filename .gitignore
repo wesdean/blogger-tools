@@ -1,5 +1,5 @@
 .idea
-app_data
+secrets
 
 # Binaries for programs and plugins
 *.exe

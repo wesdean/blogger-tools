@@ -11,8 +11,8 @@ type Config struct {
 }
 
 type BlogConfig struct {
-	APIKey string
-	ID     string
+	AccessToken string
+	ID          string
 }
 
 func NewConfig(fileName string) (*Config, error) {

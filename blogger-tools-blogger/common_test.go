@@ -9,17 +9,19 @@ import (
 var skipExternalServices = true
 
 func getConfig() (*blogger_tools_lib.Config, error) {
-	accessToken, err := ioutil.ReadFile("../secrets/access_token.txt")
+	accessToken, err := ioutil.ReadFile("../secrets/google_access_token.txt")
 	if err != nil {
 		return nil, err
 	}
 
 	return &blogger_tools_lib.Config{
 		Environment: "test",
-		Blogs: []blogger_tools_lib.BlogConfig{
-			{
-				AccessToken: string(accessToken),
-				ID:          "3051261493420306591",
+		Blogger: &blogger_tools_lib.BloggerConfig{
+			Blogs: []blogger_tools_lib.BlogConfig{
+				{
+					AccessToken: string(accessToken),
+					ID:          "3051261493420306591",
+				},
 			},
 		},
 	}, nil

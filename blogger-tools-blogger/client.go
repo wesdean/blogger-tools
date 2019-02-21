@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-var bloggerBaseURL = "https://www.googleapis.com/blogger/v3/blogs/"
+const BLOGGER_BASE_URL = "https://www.googleapis.com/blogger/v3/blogs/"
 
 type Client struct {
 	logger      *logger.Logger
@@ -41,7 +41,7 @@ type ErrorResponseErrorItem struct {
 func NewClient(logger *logger.Logger, accessToken string, blogId string) *Client {
 	return &Client{
 		logger:      logger,
-		baseURL:     bloggerBaseURL + blogId,
+		baseURL:     BLOGGER_BASE_URL + blogId,
 		accessToken: accessToken,
 		blogId:      blogId,
 		httpClient:  &http.Client{},
@@ -58,7 +58,7 @@ func (client *Client) SendRequest(path string, params map[string]string) ([]byte
 	if client.accessToken != "" {
 		options.Set("access_token", client.accessToken)
 	} else {
-		options.Set("access_token", os.Getenv("ACCESS_TOKEN"))
+		options.Set("access_token", os.Getenv("GOOGLE_ACCESS_TOKEN"))
 	}
 
 	urlStr := client.baseURL + path + "?" + options.Encode()

@@ -10,6 +10,10 @@ type BlogService struct {
 
 func (service *BlogService) Get() (blog *Blog, err error) {
 	body, err := service.SendRequest("/", nil)
+	if err != nil {
+		service.logger.Error(err)
+		return nil, err
+	}
 
 	blog = &Blog{}
 	err = json.Unmarshal(body, blog)

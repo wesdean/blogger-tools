@@ -14,8 +14,9 @@ type Config struct {
 	LogDirectory     string
 	SecretsDirectory string
 	Blogger          *BloggerConfig
-	SendGridAPIKey   string
-	Logs             BlogConfigLogs
+	SendGrid         *SendGridConfig
+	Logs             *BlogConfigLogs
+	NotifyTool       *NotifyToolConfig
 }
 
 type BloggerConfig struct {
@@ -29,14 +30,25 @@ type BlogConfig struct {
 }
 
 type BlogConfigLogs struct {
+	General    string
 	NotifyTool string
+}
+
+type SendGridConfig struct {
+	APIKey           string
+	DefaultFromEmail string
+	DefaultFromName  string
+}
+
+type NotifyToolConfig struct {
+	BlogUpdatedRecipientsFile string
 }
 
 func NewConfig(fileName string) (*Config, error) {
 	var config = &Config{
 		LogDirectory:     "./logs",
 		SecretsDirectory: "./secrets",
-		Logs: BlogConfigLogs{
+		Logs: &BlogConfigLogs{
 			NotifyTool: "notify-tool.log",
 		},
 	}
@@ -76,7 +88,7 @@ func NewConfig(fileName string) (*Config, error) {
 		return nil, err
 	}
 
-	for index, _ := range config.Blogger.Blogs {
+	for index := range config.Blogger.Blogs {
 		blogConfig := &config.Blogger.Blogs[index]
 
 		if blogConfig.AccessToken == nil {
@@ -110,7 +122,7 @@ func (config *Config) BuildSecretFilePath(filename string) string {
 	return filepath.FromSlash(filename)
 }
 
-func (config *Config) CreateLogger(filename string, verbose bool, syslog bool, reset bool) (*logger.Logger, error) {
+func (config *Config) CreateLogger(filename string, reset bool) (*logger.Logger, error) {
 	var logFile io.Writer
 	var err error
 
@@ -126,5 +138,5 @@ func (config *Config) CreateLogger(filename string, verbose bool, syslog bool, r
 	} else {
 		logFile = ioutil.Discard
 	}
-	return logger.Init("NotifyToolLog", verbose, syslog, logFile), nil
+	return logger.Init("NotifyToolLog", false, false, logFile), nil
 }

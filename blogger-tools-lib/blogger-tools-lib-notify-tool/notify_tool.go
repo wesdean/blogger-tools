@@ -23,7 +23,7 @@ type SendLatestPostOptions struct {
 }
 
 func (tool *NotifyTool) Run(args *NotifyToolArgs) (err error) {
-	log, err := tool.Config.CreateLogger(tool.Config.BuildLogFilePath(tool.Config.Logs.NotifyTool), false, false, args.ResetLog)
+	log, err := tool.Config.CreateLogger(tool.Config.BuildLogFilePath(tool.Config.Logs.NotifyTool), args.ResetLog)
 	if err != nil {
 		return err
 	}

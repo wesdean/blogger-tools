@@ -10,7 +10,7 @@ type PostList struct {
 	SelfLink   string `json:"selfLink,omitempty"`
 	Kind       string `json:"kind,omitempty"`
 	ETag       string `json:"etag,omitempty"`
-	Items      []Page
+	Items      []Post
 }
 
 func NewPostListFromJSON(data []byte) (postList *PostList, err error) {

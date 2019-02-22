@@ -2,23 +2,27 @@ package blogger_tools_blogger_test
 
 import (
 	"github.com/wesdean/blogger-tools/blogger-tools-blogger"
+	"github.com/wesdean/blogger-tools/blogger-tools-lib"
 	"testing"
 	"time"
 )
 
-func TestPostListService_Get(t *testing.T) {
-	if skipExternalServices {
-		t.Skip("Uses external services")
-		return
-	}
+var postListServiceConfigFile = "../secrets/config.blogger-tools-lib-test.json"
 
-	config, err := getConfig()
+func TestPostListService_Get(t *testing.T) {
+	config, err := blogger_tools_lib.NewConfig(postListServiceConfigFile)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	blogger := blogger_tools_blogger.NewBlogger(getLogger(), config.Blogger.Blogs[0].AccessToken, config.Blogger.Blogs[0].ID)
+	log, err := config.CreateLogger("", true)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	blogger := blogger_tools_blogger.NewBlogger(log, *config.Blogger.Blogs[0].AccessToken, config.Blogger.Blogs[0].ID)
 
 	t.Run("Fetch all posts", func(t *testing.T) {
 		postList, err := blogger.PostList.Get(nil)

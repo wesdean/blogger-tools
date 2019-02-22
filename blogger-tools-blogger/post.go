@@ -22,7 +22,7 @@ type Post struct {
 }
 
 type RepliesList struct {
-	TotalItems int    `json:"totalItems,omitempty"`
+	TotalItems int    `json:"totalItems,omitempty,string"`
 	SelfLink   string `json:"selfLink,omitempty"`
 }
 

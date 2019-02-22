@@ -8,8 +8,8 @@ type Blogger struct {
 	PostList *PostListService
 }
 
-func NewBlogger(logger *logger.Logger, apiKey string, blogId string) *Blogger {
-	client := NewClient(logger, apiKey, blogId)
+func NewBlogger(logger *logger.Logger, accessToken string, blogId string) *Blogger {
+	client := NewClient(logger, accessToken, blogId)
 	return &Blogger{
 		Blog:     &BlogService{Client: client},
 		PageList: &PageListService{Client: client},

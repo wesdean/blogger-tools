@@ -2,17 +2,20 @@ package blogger_tools_blogger_test
 
 import (
 	"github.com/wesdean/blogger-tools/blogger-tools-blogger"
+	"github.com/wesdean/blogger-tools/blogger-tools-lib"
 	"testing"
 )
 
+var pageListServiceConfigFile = "../secrets/config.blogger-tools-lib-test.json"
+
 func TestPageListService_Get(t *testing.T) {
-	config, err := getConfig()
+	config, err := blogger_tools_lib.NewConfig(pageListServiceConfigFile)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	blogger := blogger_tools_blogger.NewBlogger(nil, config.Blogs[0].AccessToken, config.Blogs[0].ID)
+	blogger := blogger_tools_blogger.NewBlogger(nil, *config.Blogger.Blogs[0].AccessToken, config.Blogger.Blogs[0].ID)
 	pageList, err := blogger.PageList.Get()
 	if err != nil {
 		t.Error(err)

@@ -1,9 +1,11 @@
 package blogger_tools_lib_notify_tool
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/wesdean/blogger-tools/blogger-tools-blogger"
 	"github.com/wesdean/blogger-tools/blogger-tools-lib"
+	"io/ioutil"
 )
 
 type NotifyTool struct {
@@ -15,21 +17,34 @@ type NotifyToolArgs struct {
 	Actions  *NotifyToolActions
 }
 
+type NotifyToolResults struct {
+	Success bool
+	Actions NotifyToolActionResults
+}
+
+type NotifyToolActionResults struct {
+	BlogUpdated bool
+}
+
 type NotifyToolActions struct {
-	SendLatestPost *SendLatestPostOptions
+	BlogUpdated *ActionBlogUpdatedOptions
 }
 
-type SendLatestPostOptions struct {
+type ActionBlogUpdatedOptions struct {
 }
 
-func (tool *NotifyTool) Run(args *NotifyToolArgs) (err error) {
+func (tool *NotifyTool) Run(args *NotifyToolArgs) (results *NotifyToolResults, err error) {
+	results = &NotifyToolResults{}
+
 	log, err := tool.Config.CreateLogger(tool.Config.BuildLogFilePath(tool.Config.Logs.NotifyTool), args.ResetLog)
 	if err != nil {
-		return err
+		return results, err
 	}
 	defer log.Close()
 
 	log.Info("Running NotifyTool")
+
+	var blogUpdatedAllRecipients *map[string][]BlogUpdatedRecipient
 
 	var errorFlag = false
 	for _, blogConfig := range tool.Config.Blogger.Blogs {
@@ -49,14 +64,51 @@ func (tool *NotifyTool) Run(args *NotifyToolArgs) (err error) {
 		if args.Actions == nil {
 			log.Infof("Blog check successful for %v", blog.Id)
 		} else {
+			notifyAction := &Action{
+				Config:          tool.Config,
+				Logger:          log,
+				Blog:            blog,
+				BlogAccessToken: *tool.Config.Blogger.Blogs[0].AccessToken,
+			}
 
+			if args.Actions.BlogUpdated != nil {
+				if blogUpdatedAllRecipients == nil {
+					recipientFile := tool.Config.BuildSecretFilePath(tool.Config.NotifyTool.BlogUpdatedRecipientsFile)
+					recipientJSON, err := ioutil.ReadFile(recipientFile)
+					if err != nil {
+						errorFlag = true
+						log.Errorf("BlogID: %s; Message: %s", blogConfig.ID, err)
+						continue
+					}
+
+					err = json.Unmarshal(recipientJSON, &blogUpdatedAllRecipients)
+					if err != nil {
+						errorFlag = true
+						log.Errorf("BlogID: %s; Message: %s", blogConfig.ID, err)
+						continue
+					}
+				}
+			}
+			action := &BlogUpdatedAction{
+				notifyAction,
+				(*blogUpdatedAllRecipients)[blog.Id],
+			}
+			err = action.Do()
+			if err != nil {
+				errorFlag = true
+				log.Errorf("BlogID: %s; Message: %s", blogConfig.ID, err)
+				continue
+			}
+			results.Actions.BlogUpdated = true
 		}
 	}
 	if errorFlag {
-		return errors.New("There were errors running NotifyTool")
+		return results, errors.New("There were errors running NotifyTool")
+	} else {
+		results.Success = true
 	}
 
 	log.Info("NotifyTool done")
 
-	return err
+	return results, err
 }

@@ -48,7 +48,7 @@ func NewClient(logger *logger.Logger, accessToken string, blogId string) *Client
 	}
 }
 
-func (client *Client) SendRequest(path string, params map[string]string) ([]byte, error) {
+func (client *Client) SendRequest(path string, params map[string]string) ([]byte, error, *ErrorResponse) {
 	options := url.Values{}
 	if params != nil {
 		for key, value := range params {
@@ -65,7 +65,7 @@ func (client *Client) SendRequest(path string, params map[string]string) ([]byte
 	resp, err := client.httpClient.Get(urlStr)
 	if err != nil {
 		client.logger.Error(err)
-		return nil, err
+		return nil, err, nil
 	}
 
 	closeBody := func(client *Client, body io.ReadCloser) {
@@ -78,7 +78,7 @@ func (client *Client) SendRequest(path string, params map[string]string) ([]byte
 	defer closeBody(client, resp.Body)
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, err, nil
 	}
 
 	if resp.StatusCode != 200 {
@@ -86,10 +86,10 @@ func (client *Client) SendRequest(path string, params map[string]string) ([]byte
 		err = json.Unmarshal(body, &respError)
 		if err != nil {
 			client.logger.Error(err)
-			return nil, err
+			return nil, err, nil
 		}
-		return nil, errors.New(fmt.Sprintf("%v: %v", resp.StatusCode, respError.Error.Message))
+		return nil, errors.New(fmt.Sprintf("%v: %v", resp.StatusCode, respError.Error.Message)), &respError
 	}
 
-	return body, nil
+	return body, nil, nil
 }

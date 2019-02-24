@@ -150,7 +150,7 @@ func (service *PostListService) Get(options *PostListServiceOptions) (postList *
 		}
 	}
 
-	body, err := service.SendRequest("/posts", params)
+	body, err, _ := service.SendRequest("/posts", params)
 	if err != nil {
 		service.logger.Error(err)
 		return nil, err

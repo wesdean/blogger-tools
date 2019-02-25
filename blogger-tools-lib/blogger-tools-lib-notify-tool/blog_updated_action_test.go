@@ -23,9 +23,13 @@ func TestBlogUpdatedAction_Do(t *testing.T) {
 	}
 
 	blogger := blogger_tools_blogger.NewBlogger(log, *config.Blogger.Blogs[0].AccessToken, config.Blogger.Blogs[0].ID)
-	blog, err := blogger.Blog.Get()
+	blog, err, response := blogger.Blog.Get()
 	if err != nil {
 		t.Error(err)
+		return
+	}
+	if response != nil {
+		t.Error(response)
 		return
 	}
 

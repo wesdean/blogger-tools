@@ -24,14 +24,16 @@ type BloggerConfig struct {
 }
 
 type BlogConfig struct {
+	ID              string
 	AccessTokenFile *string
 	AccessToken     *string
-	ID              string
+	OAuthKeyFile    *string
 }
 
 type BlogConfigLogs struct {
 	General    string
 	NotifyTool string
+	OAuthTool  string
 }
 
 type SendGridConfig struct {
@@ -92,16 +94,38 @@ func NewConfig(fileName string) (*Config, error) {
 		blogConfig := &config.Blogger.Blogs[index]
 
 		if blogConfig.AccessToken == nil {
-			accessToken, err := ioutil.ReadFile(config.BuildSecretFilePath(*blogConfig.AccessTokenFile))
+			err = config.RefreshAccessToken(blogConfig)
 			if err != nil {
 				return nil, err
 			}
-			tokenString := string(accessToken)
-			blogConfig.AccessToken = &tokenString
+		}
+
+		if blogConfig.OAuthKeyFile != nil {
+			oauthKeyFile, err := filepath.Abs(config.BuildSecretFilePath(*blogConfig.OAuthKeyFile))
+			if err != nil {
+				return nil, err
+			}
+			blogConfig.OAuthKeyFile = &oauthKeyFile
 		}
 	}
 
 	return config, nil
+}
+
+func (config *Config) RefreshAccessToken(blogConfig *BlogConfig) error {
+	tokenFile := config.BuildSecretFilePath(*blogConfig.AccessTokenFile)
+
+	if _, err := os.Stat(tokenFile); err == nil {
+		accessToken, err := ioutil.ReadFile(tokenFile)
+		if err != nil {
+			return err
+		}
+		tokenString := string(accessToken)
+		blogConfig.AccessToken = &tokenString
+	} else {
+		blogConfig.AccessToken = nil
+	}
+	return nil
 }
 
 func (config *Config) BuildLogFilePath(filename string) string {

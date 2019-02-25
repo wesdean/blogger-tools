@@ -3,8 +3,10 @@ package blogger_tools_lib_notify_tool
 import (
 	"encoding/json"
 	"errors"
+	"github.com/google/logger"
 	"github.com/wesdean/blogger-tools/blogger-tools-blogger"
 	"github.com/wesdean/blogger-tools/blogger-tools-lib"
+	"github.com/wesdean/blogger-tools/blogger-tools-lib/blogger-tools-lib-oauth-tool"
 	"io/ioutil"
 )
 
@@ -13,8 +15,9 @@ type NotifyTool struct {
 }
 
 type NotifyToolArgs struct {
-	ResetLog bool
-	Actions  *NotifyToolActions
+	ResetLog         bool
+	Actions          *NotifyToolActions
+	OAuthFlowHandler string
 }
 
 type NotifyToolResults struct {
@@ -47,14 +50,29 @@ func (tool *NotifyTool) Run(args *NotifyToolArgs) (results *NotifyToolResults, e
 	var blogUpdatedAllRecipients *map[string][]BlogUpdatedRecipient
 
 	var errorFlag = false
-	for _, blogConfig := range tool.Config.Blogger.Blogs {
+	for index := range tool.Config.Blogger.Blogs {
+		blogConfig := &tool.Config.Blogger.Blogs[index]
+
 		log.Infof("Running NotifyTool for BlogID: %s", blogConfig.ID)
 		if blogConfig.AccessToken == nil {
-			errorFlag = true
-			log.Errorf("BlogID: %s; Message: %s", blogConfig.ID, "Missing access token")
+			err = tool.refreshAccessToken(log, blogConfig, args.OAuthFlowHandler)
+			if err != nil {
+				errorFlag = true
+				log.Errorf("BlogID: %s; Message: %s", blogConfig.ID, "Missing access token")
+				continue
+			}
 		}
 		blogger := blogger_tools_blogger.NewBlogger(log, *blogConfig.AccessToken, blogConfig.ID)
-		blog, err := blogger.Blog.Get()
+		blog, err, response := blogger.Blog.Get()
+		if response != nil {
+			if response.Error.Code == 401 || response.Error.Code == 403 {
+				err = tool.refreshAccessToken(log, blogConfig, args.OAuthFlowHandler)
+				if err == nil {
+					blogger = blogger_tools_blogger.NewBlogger(log, *blogConfig.AccessToken, blogConfig.ID)
+					blog, err, response = blogger.Blog.Get()
+				}
+			}
+		}
 		if err != nil {
 			errorFlag = true
 			log.Errorf("BlogID: %s; Message: %s", blogConfig.ID, err)
@@ -111,4 +129,13 @@ func (tool *NotifyTool) Run(args *NotifyToolArgs) (results *NotifyToolResults, e
 	log.Info("NotifyTool done")
 
 	return results, err
+}
+
+func (tool *NotifyTool) refreshAccessToken(log *logger.Logger, blogConfig *blogger_tools_lib.BlogConfig, flowHandlerName string) error {
+	oauthTool := &blogger_tools_lib_oauth_tool.OAuthTool{tool.BloggerTool}
+	_, err := oauthTool.RunForBlog(blogConfig, flowHandlerName)
+	if err == nil {
+		err = tool.Config.RefreshAccessToken(blogConfig)
+	}
+	return err
 }

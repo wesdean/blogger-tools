@@ -16,9 +16,13 @@ func TestBlogService_Get(t *testing.T) {
 	}
 
 	blogger := blogger_tools_blogger.NewBlogger(nil, *config.Blogger.Blogs[0].AccessToken, config.Blogger.Blogs[0].ID)
-	blog, err := blogger.Blog.Get()
+	blog, err, response := blogger.Blog.Get()
 	if err != nil {
 		t.Error(err)
+		return
+	}
+	if response != nil {
+		t.Error(response)
 		return
 	}
 	if blog.Id != "3051261493420306591" {

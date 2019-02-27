@@ -4,6 +4,9 @@ type PageListService struct {
 	*Client
 }
 
+/*
+https://developers.google.com/blogger/docs/3.0/reference/pages/get
+*/
 func (service *PageListService) Get() (pageList *PageList, err error) {
 	body, err, _ := service.SendRequest("/pages", nil)
 

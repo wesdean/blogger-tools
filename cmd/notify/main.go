@@ -12,7 +12,7 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = "Blogger Notify Tool"
-	app.Version = "0.0.0"
+	app.Version = "0.1.0"
 	app.Usage = "send notification of blog events"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -48,7 +48,10 @@ func main() {
 			Name:  "diagnostic",
 			Usage: "run notify tool diagnostics",
 			Action: func(context *cli.Context) error {
-				results, err := tool.Run(&blogger_tools_lib_notify_tool.NotifyToolArgs{ResetLog: true})
+				results, err := tool.Run(&blogger_tools_lib_notify_tool.NotifyToolArgs{
+					ResetLog:         true,
+					OAuthFlowHandler: "cli",
+				})
 				if err != nil {
 					return err
 				}

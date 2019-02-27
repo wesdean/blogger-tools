@@ -1,0 +1,26 @@
+{
+  "LogDirectory": "/path/to/logs",
+  "SecretsDirectory": "/path/to/secrets",
+  "Blogger": {
+    "Blogs": [
+      {
+        "ID": "SOME_BLOG_ID",
+        "AccessTokenFile": "plain_text_file_that_will_store_an_access_token.txt",
+        "OAuthKeyFile": "your_google_oauth_key_file.json"
+      }
+    ]
+  },
+  "SendGrid": {
+    "APIKey": "YOUR_SENDGRID_API_KEY",
+    "DefaultFromEmail": "email_address@to_send_from.tld",
+    "DefaultFromName": "Sender Name"
+  },
+  "Logs": {
+    "General": "error.log",
+    "NotifyTool": "notify-tool-test.log",
+    "OAuthTool": "oauth-tool-test.log"
+  },
+  "NotifyTool": {
+    "BlogUpdatedRecipientsFile": "data/blog-updated-recipients.json"
+  }
+}

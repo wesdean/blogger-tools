@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+/*
+https://developers.google.com/blogger/docs/3.0/reference/pages
+*/
 type Page struct {
 	Kind      string    `json:"kind,omitempty"`
 	Id        string    `json:"id,omitempty"`

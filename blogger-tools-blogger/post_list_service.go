@@ -110,7 +110,7 @@ func (options *PostListServiceOptions) Labels(labels ...string) *PostListService
 }
 
 /*
-https://developers.google.com/blogger/docs/3.0/reference/posts/list#http-request
+https://developers.google.com/blogger/docs/3.0/reference/posts/get
 */
 func (service *PostListService) Get(options *PostListServiceOptions) (postList *PostList, err error) {
 	var params map[string]string

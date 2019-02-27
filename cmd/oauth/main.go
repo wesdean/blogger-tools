@@ -14,7 +14,7 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = "OAuth Tool"
-	app.Version = "0.0.0"
+	app.Version = "0.1.0"
 	app.Usage = "perform oauth workflow to gain access to the Google Blogger API"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -49,7 +49,10 @@ func main() {
 		tool = &blogger_tools_lib_oauth_tool.OAuthTool{bloggerTool}
 
 		for _, id := range strings.Split(context.String("blogs"), ",") {
-			blogIds = append(blogIds, strings.TrimSpace(id))
+			id = strings.TrimSpace(id)
+			if id != "" {
+				blogIds = append(blogIds, id)
+			}
 		}
 
 		return err

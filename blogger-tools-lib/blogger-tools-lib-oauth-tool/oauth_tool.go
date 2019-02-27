@@ -40,16 +40,21 @@ func (tool *OAuthTool) Run(args *OAuthToolArgs) (results *OAuthToolResults, err 
 
 	errorFlag := false
 	for index, blogConfig := range tool.Config.Blogger.Blogs {
-		if !tool.hasBlogId(blogConfig.ID, args.BlogIds) {
-			results.Blogs[blogConfig.ID] = "skipped: not selected"
-			continue
+		if len(args.BlogIds) > 0 {
+			if !tool.hasBlogId(blogConfig.ID, args.BlogIds) {
+				log.Infof("%s skipped: not selected", blogConfig.ID)
+				results.Blogs[blogConfig.ID] = "skipped: not selected"
+				continue
+			}
 		}
 
 		if *blogConfig.OAuthKeyFile == "" {
+			log.Infof("%s skipped: no key file", blogConfig.ID)
 			results.Blogs[blogConfig.ID] = "skipped: no key file"
 			continue
 		}
 
+		log.Infof("%s running", blogConfig.ID)
 		message, err := tool.RunForBlog(&tool.Config.Blogger.Blogs[index], args.AuthFlowHandler)
 		if err != nil {
 			log.Error(strings.Replace(message, "\n", "", -1))
@@ -64,6 +69,7 @@ func (tool *OAuthTool) Run(args *OAuthToolArgs) (results *OAuthToolResults, err 
 		log.Error("authentication errors occurred")
 		return results, errors.New("authentication errors occurred")
 	} else {
+		log.Info("OAuthTool successful")
 		results.Success = true
 	}
 

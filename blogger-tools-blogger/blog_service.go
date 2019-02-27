@@ -8,6 +8,9 @@ type BlogService struct {
 	*Client
 }
 
+/*
+https://developers.google.com/blogger/docs/3.0/reference/blogs/get
+*/
 func (service *BlogService) Get() (blog *Blog, err error, response *ErrorResponse) {
 	body, err, response := service.SendRequest("/", nil)
 	if err != nil {

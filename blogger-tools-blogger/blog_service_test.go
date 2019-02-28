@@ -15,7 +15,13 @@ func TestBlogService_Get(t *testing.T) {
 		return
 	}
 
-	blogger := blogger_tools_blogger.NewBlogger(nil, *config.Blogger.Blogs[0].AccessToken, config.Blogger.Blogs[0].ID)
+	log, err := config.CreateLogger("", true)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	blogger := blogger_tools_blogger.NewBlogger(log, *config.Blogger.Blogs[0].AccessToken, config.Blogger.Blogs[0].ID)
 	blog, err, response := blogger.Blog.Get()
 	if err != nil {
 		t.Error(err)
